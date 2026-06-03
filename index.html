@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Latch — one line of code makes your site work inside AI browsers</title>
+<meta name="description" content="Paste one line of code and your site's buttons, search, and forms become actions an AI agent can actually take. WebMCP, no server, no rewrite.">
+<meta property="og:title" content="Latch — make your site usable by AI agents in one line">
+<meta property="og:description" content="AI browsers are already clicking through your site — and failing. Latch exposes your search, cart, and forms as WebMCP tools. One line, no backend.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>🔗</text></svg>">
+<style>
+  :root{
+    --bg:#0b0d10; --panel:#12161c; --line:#222a33; --ink:#e8edf2;
+    --mut:#8a97a6; --acc:#5eead4; --acc2:#38bdf8; --warn:#fbbf24;
+    --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased}
+  a{color:var(--acc2);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .wrap{max-width:920px;margin:0 auto;padding:0 20px}
+  header.site{display:flex;align-items:center;justify-content:space-between;padding:22px 0}
+  .brand{font-weight:700;font-size:20px;letter-spacing:.3px}
+  .brand .dot{color:var(--acc)}
+  nav.site a{color:var(--mut);margin-left:20px;font-size:14px}
+  .hero{padding:64px 0 36px;text-align:center}
+  .pill{display:inline-block;font:600 12px/1 var(--mono);color:var(--acc);
+    border:1px solid var(--line);border-radius:999px;padding:7px 12px;margin-bottom:22px}
+  h1{font-size:clamp(30px,6vw,52px);line-height:1.08;margin:.2em 0;letter-spacing:-.02em}
+  h1 .grad{background:linear-gradient(90deg,var(--acc),var(--acc2));
+    -webkit-background-clip:text;background-clip:text;color:transparent}
+  .sub{color:var(--mut);font-size:clamp(16px,2.4vw,20px);max-width:620px;margin:18px auto 30px}
+  .snippet{display:flex;gap:10px;max-width:680px;margin:0 auto;align-items:stretch}
+  .snippet code{flex:1;font:14px/1.5 var(--mono);background:var(--panel);
+    border:1px solid var(--line);border-radius:10px;padding:14px 16px;text-align:left;
+    color:var(--ink);overflow:auto;white-space:nowrap}
+  .snippet code .tag{color:var(--acc2)} .snippet code .attr{color:var(--acc)}
+  .snippet code .str{color:var(--warn)}
+  button.copy{font:600 14px var(--mono);background:var(--acc);color:#04201b;border:0;
+    border-radius:10px;padding:0 18px;cursor:pointer;white-space:nowrap}
+  button.copy:hover{filter:brightness(1.08)}
+  .note{color:var(--mut);font-size:13px;margin-top:14px}
+  section{padding:40px 0;border-top:1px solid var(--line)}
+  h2{font-size:24px;margin:0 0 6px;letter-spacing:-.01em}
+  .lede{color:var(--mut);margin:0 0 22px}
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  @media(max-width:720px){.grid{grid-template-columns:1fr}}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px}
+  .card h3{margin:0 0 6px;font-size:16px}
+  .card p{margin:0;color:var(--mut);font-size:14px}
+  /* agent's-eye view */
+  .eye{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+  .eye .bar{display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid var(--line);
+    font:12px var(--mono);color:var(--mut)}
+  .eye .bar .led{width:10px;height:10px;border-radius:50%;background:#333}
+  .eye .bar .led.on{background:var(--acc);box-shadow:0 0 8px var(--acc)}
+  .eye .body{padding:16px;font:13.5px/1.6 var(--mono)}
+  .tool{padding:12px 14px;border:1px solid var(--line);border-radius:10px;margin:10px 0;background:#0e1318}
+  .tool .n{color:var(--acc)} .tool .why{color:var(--mut);font-size:12px;display:block;margin-top:3px}
+  .empty{color:var(--mut)}
+  .demoform{display:grid;gap:10px;max-width:420px;margin-top:8px}
+  .demoform input,.demoform textarea{background:#0e1318;border:1px solid var(--line);
+    color:var(--ink);border-radius:8px;padding:9px 11px;font:14px var(--mono)}
+  .demoform button{justify-self:start;background:var(--acc);color:#04201b;border:0;
+    border-radius:8px;padding:9px 16px;font:600 14px var(--mono);cursor:pointer}
+  footer{padding:40px 0 60px;color:var(--mut);font-size:13px;text-align:center;border-top:1px solid var(--line)}
+  .kbd{font:12px var(--mono);background:#0e1318;border:1px solid var(--line);border-radius:6px;padding:2px 7px;color:var(--ink)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="site">
+    <div class="brand">🔗 Latch<span class="dot">.</span></div>
+    <nav class="site" role="navigation">
+      <a href="#how">How it works</a>
+      <a href="#eye">Agent's-eye view</a>
+      <a href="https://github.com/r0bertini/latch">GitHub</a>
+    </nav>
+  </header>
+
+  <section class="hero" style="border:0">
+    <span class="pill">WebMCP · W3C standard · works in Chrome 146+, Edge 147+, Atlas, Comet</span>
+    <h1>One line makes your site<br><span class="grad">work inside AI browsers.</span></h1>
+    <p class="sub">AI agents are already clicking through your site — and failing on your
+      buttons and forms. Latch exposes your search, cart, and contact forms as
+      <strong>WebMCP tools</strong> an agent can actually use. No server. No rewrite.</p>
+    <div class="snippet">
+      <code id="snip"><span class="tag">&lt;script</span> <span class="attr">src</span>=<span class="str">"https://latch.dev/latch.js"</span> <span class="attr">defer</span><span class="tag">&gt;&lt;/script&gt;</span></code>
+      <button class="copy" id="copyBtn">Copy</button>
+    </div>
+    <p class="note">Drop it before <span class="kbd">&lt;/body&gt;</span>. Zero dependencies · ~6&nbsp;KB · degrades silently where WebMCP isn't present.</p>
+  </section>
+
+  <section id="how">
+    <h2>What Latch does</h2>
+    <p class="lede">It reads your page (read-only) and registers the actions an agent needs — nothing else.</p>
+    <div class="grid">
+      <div class="card"><h3>🔎 search_site</h3><p>Finds your search box, types the query, and submits — so an agent can look things up.</p></div>
+      <div class="card"><h3>🛒 add_to_cart</h3><p>Detects “Add to cart / Buy now” controls and clicks them on the agent's behalf.</p></div>
+      <div class="card"><h3>✉️ submit_form</h3><p>Maps your contact / booking / signup fields into a tool an agent can fill and send.</p></div>
+      <div class="card"><h3>🧭 navigate</h3><p>Surfaces your main nav links so an agent can move around the site reliably.</p></div>
+      <div class="card"><h3>🛡️ Safe by default</h3><p>Read-only discovery. If WebMCP isn't there, Latch does nothing and never breaks your page.</p></div>
+      <div class="card"><h3>⚡ Zero backend</h3><p>One static script. No MCP server to host, no API keys, no build step.</p></div>
+    </div>
+  </section>
+
+  <section id="eye">
+    <h2>Agent's-eye view — live</h2>
+    <p class="lede">This page runs Latch on <em>itself</em>. Below is exactly what an AI agent now sees.
+      Try the demo search and contact form — they're real, and Latch turned them into tools.</p>
+
+    <div class="eye">
+      <div class="bar"><span class="led" id="led"></span><span id="status">detecting…</span></div>
+      <div class="body" id="tools"><span class="empty">Scanning the page…</span></div>
+    </div>
+
+    <div style="margin-top:24px">
+      <h3 style="margin:0 0 6px">Demo surface (so there's something to detect)</h3>
+      <form role="search" onsubmit="event.preventDefault();alert('search_site → '+this.q.value)">
+        <input type="search" name="q" placeholder="Search this site…" aria-label="Search"
+               style="background:#0e1318;border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:9px 12px;font:14px var(--mono);width:min(360px,90%)">
+      </form>
+      <form class="demoform" aria-label="Contact"
+            onsubmit="event.preventDefault();alert('submit_form → '+this.email.value)">
+        <input type="text" name="name" placeholder="Your name" required>
+        <input type="email" name="email" placeholder="you@example.com" required>
+        <textarea name="message" placeholder="Message" rows="3"></textarea>
+        <button type="submit">Send message</button>
+      </form>
+    </div>
+  </section>
+
+  <footer>
+    <p>🔗 <strong>Latch</strong> — make your site agent-ready in one line.
+       Open source (MIT) · <a href="https://github.com/r0bertini/latch">github.com/r0bertini/latch</a></p>
+    <p class="note">“Latch” is a common word used by other companies in unrelated classes; this is an independent open-source WebMCP dev tool.</p>
+  </footer>
+
+</div>
+
+<!-- Latch running on its own landing page -->
+<script src="latch.js" data-latch-manual defer></script>
+<script>
+  // Copy-to-clipboard for the snippet.
+  document.getElementById("copyBtn").addEventListener("click", function () {
+    var line = '<script src="https://latch.dev/latch.js" defer><\/script>';
+    navigator.clipboard && navigator.clipboard.writeText(line);
+    this.textContent = "Copied ✓";
+    var b = this; setTimeout(function(){ b.textContent = "Copy"; }, 1600);
+  });
+
+  // Render the agent's-eye view from Latch.inspect(), then register for real.
+  function renderEye() {
+    var view = (window.Latch && Latch.inspect) ? Latch.inspect() : { webmcp:false, tools:[] };
+    var led = document.getElementById("led");
+    var status = document.getElementById("status");
+    var box = document.getElementById("tools");
+    if (view.webmcp) {
+      led.classList.add("on");
+      status.textContent = "WebMCP detected — your browser is agent-capable. Latch registered "
+        + view.tools.length + " tool(s).";
+    } else {
+      status.textContent = "WebMCP not detected in this browser — Latch stays dormant here. "
+        + "These are the tools it WOULD expose in an AI browser:";
+    }
+    if (!view.tools.length) { box.innerHTML = '<span class="empty">No actionable elements found.</span>'; return; }
+    box.innerHTML = view.tools.map(function (t) {
+      return '<div class="tool"><span class="n">' + t.name + '()</span>'
+           + '<span class="why">// ' + t.why + '</span></div>';
+    }).join("");
+    if (window.Latch && Latch.init) Latch.init(); // actually expose them where supported
+  }
+  if (document.readyState === "loading")
+    document.addEventListener("DOMContentLoaded", renderEye);
+  else renderEye();
+</script>
+</body>
+</html>
