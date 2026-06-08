@@ -12,12 +12,84 @@
  *         (or:  <script src="latch.js" data-latch-manual defer></script>
  *               and call  Latch.init()  yourself.)
  *
- * Zero dependencies. MIT licensed. https://latch.dev
+ * Optional analytics: add  data-key="lk_…"  to send metadata-only tool-usage
+ * telemetry to the Latch collector. Without a key, Latch makes no network
+ * calls at all. See https://latch.tools/app
+ *
+ * Zero dependencies. MIT licensed. https://latch.tools
  */
 (function (global) {
   "use strict";
 
   var VERSION = "0.1.0";
+
+  // ---- optional, opt-in telemetry --------------------------------------
+  // Off by default. Turns on ONLY when the script tag carries data-key:
+  //   <script src=".../latch.js" data-key="lk_…" defer></script>
+  // Reports metadata only — tool name, ok/fail, page path, timestamp — to the
+  // Latch collector (derived from this script's own origin, or data-endpoint).
+  // Never form contents, query strings, or PII. No key => zero network calls.
+  var SELF = document.currentScript;
+  var CFG = (function () {
+    var key = SELF && SELF.getAttribute("data-key");
+    if (!key) return { enabled: false };
+    var ep = (SELF && SELF.getAttribute("data-endpoint")) || "";
+    if (!ep) {
+      try { ep = new URL(SELF.src).origin + "/api/v1/collect"; }
+      catch (e) { ep = "/api/v1/collect"; }
+    }
+    return { enabled: true, key: key, endpoint: ep };
+  })();
+
+  var Telemetry = {
+    enabled: CFG.enabled,
+    queue: [],
+    track: function (type, tool, ok) {
+      if (!this.enabled) return;
+      var p = "";
+      try { p = String(location.pathname).slice(0, 200); } catch (e) {}
+      this.queue.push({
+        t: type, tool: tool || null,
+        ok: ok === undefined ? null : (ok ? 1 : 0),
+        p: p, ts: Date.now()
+      });
+    },
+    flush: function () {
+      if (!this.enabled || !this.queue.length) return;
+      var payload = JSON.stringify({ k: CFG.key, events: this.queue.splice(0) });
+      try {
+        // text/plain keeps it a CORS "simple request" (no preflight).
+        if (global.navigator && navigator.sendBeacon) {
+          navigator.sendBeacon(CFG.endpoint, new Blob([payload], { type: "text/plain" }));
+        } else if (global.fetch) {
+          fetch(CFG.endpoint, { method: "POST", body: payload,
+            headers: { "content-type": "text/plain" }, keepalive: true, mode: "no-cors" });
+        }
+      } catch (e) { if (Latch.debug) console.warn("[latch] telemetry flush failed", e); }
+    }
+  };
+
+  // Wrap a tool's execute() so each agent invocation is recorded with its
+  // outcome. sendBeacon survives the navigation/submit some tools trigger.
+  function instrument(tool) {
+    if (!Telemetry.enabled || typeof tool.execute !== "function") return tool;
+    var orig = tool.execute, name = tool.name;
+    tool.execute = function () {
+      var r;
+      try { r = orig.apply(this, arguments); }
+      catch (e) { Telemetry.track("call", name, false); Telemetry.flush(); throw e; }
+      if (r && typeof r.then === "function") {
+        return r.then(
+          function (v) { Telemetry.track("call", name, !(v && v.isError)); Telemetry.flush(); return v; },
+          function (e) { Telemetry.track("call", name, false); Telemetry.flush(); throw e; }
+        );
+      }
+      Telemetry.track("call", name, !(r && r.isError));
+      Telemetry.flush();
+      return r;
+    };
+    return tool;
+  }
 
   // ---- WebMCP capability detection -------------------------------------
   // The Web Model Context API is still settling; support both the
@@ -154,6 +226,7 @@
 
   function register(tool) {
     var m = mc();
+    tool = instrument(tool);
     try {
       if (typeof m.registerTool === "function") {
         m.registerTool(tool);
@@ -333,6 +406,11 @@
       try {
         buildTools();
         flushBatch();
+        if (Telemetry.enabled) {
+          Telemetry.track("pageview");
+          registered.forEach(function (n) { Telemetry.track("register", n, true); });
+          Telemetry.flush();
+        }
         if (Latch.debug) console.info("[latch] registered tools:", registered.slice());
       } catch (e) {
         if (Latch.debug) console.warn("[latch] init failed (host page unaffected):", e);
@@ -344,8 +422,7 @@
   global.Latch = Latch;
 
   // Auto-init unless the host opts out with data-latch-manual.
-  var self = document.currentScript;
-  var manual = self && self.hasAttribute("data-latch-manual");
+  var manual = SELF && SELF.hasAttribute("data-latch-manual");
   if (!manual) {
     if (document.readyState === "loading") {
       document.addEventListener("DOMContentLoaded", function () { Latch.init(); });

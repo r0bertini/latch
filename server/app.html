@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Latch — Agent Analytics</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>🔗</text></svg>">
+<style>
+  :root{
+    --bg:#0b0d10; --panel:#12161c; --line:#222a33; --ink:#e8edf2;
+    --mut:#8a97a6; --acc:#5eead4; --acc2:#38bdf8; --warn:#fbbf24; --bad:#f87171;
+    --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased}
+  a{color:var(--acc2);text-decoration:none} a:hover{text-decoration:underline}
+  .wrap{max-width:980px;margin:0 auto;padding:0 20px}
+  header{display:flex;align-items:center;justify-content:space-between;padding:20px 0;border-bottom:1px solid var(--line)}
+  .brand{font-weight:700;font-size:18px} .brand .dot{color:var(--acc)}
+  .brand small{color:var(--mut);font-weight:500;font-size:13px;margin-left:8px}
+  h1{font-size:22px;margin:26px 0 4px;letter-spacing:-.01em}
+  h2{font-size:15px;margin:26px 0 10px;color:var(--mut);text-transform:uppercase;letter-spacing:.08em;font-weight:600}
+  .lede{color:var(--mut);margin:0 0 18px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px}
+  .row{display:flex;gap:10px;flex-wrap:wrap}
+  input,select{background:#0e1318;border:1px solid var(--line);color:var(--ink);
+    border-radius:8px;padding:10px 12px;font:14px var(--mono)}
+  input{flex:1;min-width:180px}
+  button{background:var(--acc);color:#04201b;border:0;border-radius:8px;
+    padding:10px 16px;font:600 14px var(--mono);cursor:pointer}
+  button.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+  button:hover{filter:brightness(1.08)}
+  .note{color:var(--mut);font-size:13px}
+  .err{color:var(--bad);font-size:13px;min-height:18px}
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+  @media(max-width:720px){.kpis{grid-template-columns:repeat(2,1fr)}}
+  .kpi{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px}
+  .kpi .v{font:700 26px/1 var(--mono);letter-spacing:-.02em}
+  .kpi .l{color:var(--mut);font-size:12px;margin-top:6px;text-transform:uppercase;letter-spacing:.06em}
+  .kpi .v.good{color:var(--acc)} .kpi .v.bad{color:var(--bad)}
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line)}
+  th{color:var(--mut);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.05em}
+  td.mono,th.mono{font-family:var(--mono)}
+  .pill{display:inline-block;font:600 11px var(--mono);padding:2px 8px;border-radius:999px;border:1px solid var(--line)}
+  .pill.ok{color:var(--acc);border-color:#1f4d44} .pill.fail{color:var(--bad);border-color:#5a2a2a}
+  .pill.free{color:var(--warn);border-color:#5a4a1f} .pill.pro{color:var(--acc);border-color:#1f4d44}
+  .bars{display:flex;align-items:flex-end;gap:4px;height:120px;padding-top:8px}
+  .bars .b{flex:1;background:linear-gradient(180deg,var(--acc2),var(--acc));
+    border-radius:3px 3px 0 0;min-height:2px;position:relative}
+  .bars .b:hover::after{content:attr(data-t);position:absolute;bottom:100%;left:50%;
+    transform:translateX(-50%);white-space:nowrap;background:#0e1318;border:1px solid var(--line);
+    border-radius:6px;padding:3px 7px;font:11px var(--mono);color:var(--ink);margin-bottom:4px}
+  .axis{display:flex;justify-content:space-between;color:var(--mut);font:11px var(--mono);margin-top:6px}
+  .snip{font:13px var(--mono);background:#0e1318;border:1px solid var(--line);
+    border-radius:8px;padding:12px;overflow:auto;white-space:pre;color:var(--ink)}
+  .upgrade{background:linear-gradient(180deg,#11201d,#0e1318);border:1px solid #1f4d44}
+  .hide{display:none}
+  footer{color:var(--mut);font-size:12px;text-align:center;padding:30px 0;border-top:1px solid var(--line);margin-top:34px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">🔗 Latch<span class="dot">.</span><small>Agent Analytics</small></div>
+    <nav><a href="/">← Landing</a></nav>
+  </header>
+
+  <!-- ONBOARD: create a key -->
+  <section id="onboard">
+    <h1>See what AI agents do on your site</h1>
+    <p class="lede">Create a free project key, add it to your Latch tag, and this dashboard fills
+      with the tools agents call, what works, and what fails — privacy-preserving, metadata only.</p>
+    <div class="card">
+      <h2 style="margin-top:0">New project</h2>
+      <div class="row">
+        <input id="pname" placeholder="Project name (e.g. my-shop)" autocomplete="off">
+        <input id="pemail" type="email" placeholder="you@example.com" autocomplete="off">
+        <button id="create">Create key</button>
+      </div>
+      <p class="err" id="cerr"></p>
+      <p class="note">Already have a key? <a href="#" id="haveKey">Open a dashboard →</a></p>
+    </div>
+
+    <div class="card hide" id="created" style="margin-top:14px">
+      <h2 style="margin-top:0">Your project key</h2>
+      <div class="snip" id="keyout"></div>
+      <p class="note">Add it to your script tag (drop before <code>&lt;/body&gt;</code>):</p>
+      <div class="snip" id="tagout"></div>
+      <p class="note">Then <a href="#" id="goDash">open your dashboard →</a>. Keep the key private-ish:
+        anyone with it can view this project's metrics.</p>
+    </div>
+  </section>
+
+  <!-- KEY ENTRY -->
+  <section id="enter" class="hide">
+    <h1>Open a dashboard</h1>
+    <div class="card">
+      <div class="row">
+        <input id="kin" placeholder="lk_…  your project key">
+        <select id="days">
+          <option value="7">7 days</option>
+          <option value="30" selected>30 days</option>
+          <option value="90">90 days (Pro)</option>
+        </select>
+        <button id="load">View</button>
+        <button class="ghost" id="backNew">New project</button>
+      </div>
+      <p class="err" id="lerr"></p>
+    </div>
+  </section>
+
+  <!-- DASHBOARD -->
+  <section id="dash" class="hide">
+    <h1 style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+      <span id="dname">—</span>
+      <span class="pill" id="dplan">free</span>
+      <span style="margin-left:auto;font-size:13px;font-weight:400">
+        <a href="#" id="switch">switch key</a> · <span class="note" id="drange"></span>
+      </span>
+    </h1>
+
+    <div class="kpis">
+      <div class="kpi"><div class="v" id="k_calls">0</div><div class="l">Tool calls</div></div>
+      <div class="kpi"><div class="v good" id="k_sr">—</div><div class="l">Success rate</div></div>
+      <div class="kpi"><div class="v" id="k_pv">0</div><div class="l">Agent pageviews</div></div>
+      <div class="kpi"><div class="v" id="k_reg">0</div><div class="l">Tools exposed</div></div>
+    </div>
+
+    <h2>Tool calls per day</h2>
+    <div class="card">
+      <div class="bars" id="bars"></div>
+      <div class="axis"><span id="ax0"></span><span id="ax1"></span></div>
+    </div>
+
+    <h2>By tool</h2>
+    <div class="card" style="padding:0;overflow:hidden">
+      <table><thead><tr><th>Tool</th><th>Calls</th><th>OK</th><th>Failed</th><th>Success</th></tr></thead>
+      <tbody id="tbtool"></tbody></table>
+    </div>
+
+    <div id="agentWrap">
+      <h2>Top agents</h2>
+      <div class="card" style="padding:0;overflow:hidden">
+        <table><thead><tr><th>Agent (User-Agent)</th><th>Events</th></tr></thead>
+        <tbody id="tbagent"></tbody></table>
+      </div>
+    </div>
+
+    <h2>Recent activity</h2>
+    <div class="card" style="padding:0;overflow:hidden">
+      <table><thead><tr><th>When</th><th>Type</th><th>Tool</th><th>Result</th><th>Path</th></tr></thead>
+      <tbody id="tbrecent"></tbody></table>
+    </div>
+
+    <div class="card upgrade hide" id="upsell" style="margin-top:18px">
+      <h2 style="margin-top:0;color:var(--acc)">Unlock Pro</h2>
+      <p class="note" style="font-size:14px;margin-top:0">You're on Free — last 14 days, no agent breakdown.
+        Pro gives 90-day history, the agent breakdown above, the full event feed, and weekly email summaries.</p>
+      <a href="/#pricing"><button>See Pro →</button></a>
+    </div>
+  </section>
+
+  <footer>🔗 Latch — metadata-only, opt-in analytics. No form contents, no PII from your page.</footer>
+</div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const API = "/api/v1";
+const fmt = (n) => (n == null ? "—" : Number(n).toLocaleString());
+const show = (el, on) => el.classList.toggle("hide", !on);
+
+function panel(name){
+  ["onboard","enter","dash"].forEach((p)=>show($(p), p===name));
+}
+
+// ---- create a project key
+$("create").onclick = async () => {
+  $("cerr").textContent = "";
+  const name = $("pname").value.trim(), email = $("pemail").value.trim();
+  if (!name || !email) { $("cerr").textContent = "Name and email are required."; return; }
+  try {
+    const r = await fetch(API + "/sites", {
+      method: "POST", headers: { "content-type": "application/json" },
+      body: JSON.stringify({ name, email }),
+    });
+    const d = await r.json();
+    if (!r.ok) { $("cerr").textContent = d.error || "Could not create project."; return; }
+    $("keyout").textContent = d.key;
+    const origin = location.origin;
+    $("tagout").textContent =
+      '<script src="' + origin + '/latch.js" data-key="' + d.key + '" defer><\/script>';
+    show($("created"), true);
+    localStorage.setItem("latch_key", d.key);
+    $("goDash").onclick = (e) => { e.preventDefault(); $("kin").value = d.key; loadDash(); };
+  } catch (e) { $("cerr").textContent = "Network error."; }
+};
+
+$("haveKey").onclick = (e) => { e.preventDefault(); panel("enter"); const k = localStorage.getItem("latch_key"); if (k) $("kin").value = k; };
+$("backNew").onclick = () => panel("onboard");
+$("switch").onclick = (e) => { e.preventDefault(); panel("enter"); };
+$("load").onclick = () => loadDash();
+
+// ---- render dashboard
+async function loadDash() {
+  const key = $("kin").value.trim();
+  const days = $("days").value;
+  $("lerr").textContent = "";
+  if (!key) { $("lerr").textContent = "Enter a project key."; return; }
+  try {
+    const r = await fetch(API + "/stats?k=" + encodeURIComponent(key) + "&days=" + days);
+    const d = await r.json();
+    if (!r.ok) { $("lerr").textContent = d.error || "Could not load."; return; }
+    localStorage.setItem("latch_key", key);
+    render(d);
+    panel("dash");
+  } catch (e) { $("lerr").textContent = "Network error."; }
+}
+
+function render(d) {
+  $("dname").textContent = d.site.name;
+  const plan = $("dplan");
+  plan.textContent = d.plan; plan.className = "pill " + d.plan;
+  $("drange").textContent = "last " + d.range_days + " days";
+
+  $("k_calls").textContent = fmt(d.totals.calls);
+  $("k_pv").textContent = fmt(d.totals.pageviews);
+  $("k_reg").textContent = fmt(d.totals.registers);
+  const sr = $("k_sr");
+  sr.textContent = d.success_rate == null ? "—" : d.success_rate + "%";
+  sr.className = "v " + (d.success_rate == null ? "" : d.success_rate >= 80 ? "good" : "bad");
+
+  // bars
+  const bars = $("bars"); bars.innerHTML = "";
+  const days = d.by_day; const max = Math.max(1, ...days.map((x) => x.calls));
+  days.forEach((x) => {
+    const b = document.createElement("div");
+    b.className = "b"; b.style.height = Math.round((x.calls / max) * 100) + "%";
+    b.dataset.t = x.day + ": " + x.calls; bars.appendChild(b);
+  });
+  $("ax0").textContent = days.length ? days[0].day : "";
+  $("ax1").textContent = days.length ? days[days.length - 1].day : "";
+
+  // by tool
+  $("tbtool").innerHTML = d.by_tool.length ? d.by_tool.map((t) => {
+    const rate = t.calls ? Math.round((t.ok / t.calls) * 100) : 0;
+    return `<tr><td class="mono">${esc(t.tool)}</td><td>${fmt(t.calls)}</td>
+      <td>${fmt(t.ok)}</td><td>${fmt(t.fail)}</td><td>${t.calls ? rate + "%" : "—"}</td></tr>`;
+  }).join("") : emptyRow(5);
+
+  // agents (pro)
+  show($("agentWrap"), d.plan === "pro");
+  if (d.plan === "pro")
+    $("tbagent").innerHTML = d.by_agent.length
+      ? d.by_agent.map((a) => `<tr><td class="mono">${esc(a.agent)}</td><td>${fmt(a.n)}</td></tr>`).join("")
+      : emptyRow(2);
+
+  // recent
+  $("tbrecent").innerHTML = d.recent.length ? d.recent.map((e) => {
+    const res = e.type === "call"
+      ? `<span class="pill ${e.ok === 1 ? "ok" : e.ok === 0 ? "fail" : ""}">${e.ok === 1 ? "ok" : e.ok === 0 ? "fail" : "—"}</span>`
+      : "—";
+    return `<tr><td class="mono">${when(e.ts)}</td><td>${esc(e.type)}</td>
+      <td class="mono">${esc(e.tool || "—")}</td><td>${res}</td><td class="mono">${esc(e.path || "—")}</td></tr>`;
+  }).join("") : emptyRow(5);
+
+  show($("upsell"), d.locked);
+}
+
+const esc = (s) => String(s == null ? "" : s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const emptyRow = (n) => `<tr><td colspan="${n}" style="color:var(--mut);text-align:center;padding:18px">No data yet — add your key to a live page and let an agent visit.</td></tr>`;
+function when(ts){ const dt = new Date(ts); return dt.toLocaleDateString() + " " + dt.toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"}); }
+
+// boot: if a key is remembered, go straight to entry
+(function(){ const k = localStorage.getItem("latch_key"); if (k){ panel("enter"); $("kin").value = k; } })();
+</script>
+</body>
+</html>

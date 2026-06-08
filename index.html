@@ -69,6 +69,24 @@
     border-radius:8px;padding:9px 16px;font:600 14px var(--mono);cursor:pointer}
   footer{padding:40px 0 60px;color:var(--mut);font-size:13px;text-align:center;border-top:1px solid var(--line)}
   .kbd{font:12px var(--mono);background:#0e1318;border:1px solid var(--line);border-radius:6px;padding:2px 7px;color:var(--ink)}
+  /* pricing */
+  .price{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:8px}
+  @media(max-width:720px){.price{grid-template-columns:1fr}}
+  .tier{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px;display:flex;flex-direction:column}
+  .tier.pro{border-color:#1f4d44;background:linear-gradient(180deg,#11201d,#0e1318)}
+  .tier .tag{font:600 11px var(--mono);color:var(--acc);text-transform:uppercase;letter-spacing:.08em}
+  .tier h3{margin:6px 0 0;font-size:19px}
+  .tier .amt{font:700 30px/1 var(--mono);margin:12px 0 0;letter-spacing:-.02em}
+  .tier .amt small{font:500 13px var(--mono);color:var(--mut)}
+  .tier ul{list-style:none;padding:0;margin:14px 0 20px;font-size:14px}
+  .tier li{padding:5px 0 5px 22px;position:relative;color:var(--mut)}
+  .tier li::before{content:"✓";position:absolute;left:0;color:var(--acc)}
+  .tier .cta{margin-top:auto}
+  .tier .cta a,.tier .cta button{display:block;width:100%;text-align:center;box-sizing:border-box;
+    border-radius:10px;padding:11px 16px;font:600 14px var(--mono);cursor:pointer;border:0;text-decoration:none}
+  .tier .cta .primary{background:var(--acc);color:#04201b}
+  .tier .cta .second{background:transparent;color:var(--ink);border:1px solid var(--line)}
+  .tier .cta a:hover{filter:brightness(1.08);text-decoration:none}
 </style>
 </head>
 <body>
@@ -79,6 +97,8 @@
     <nav class="site" role="navigation">
       <a href="#how">How it works</a>
       <a href="#eye">Agent's-eye view</a>
+      <a href="#pricing">Pricing</a>
+      <a href="/app">Analytics</a>
       <a href="https://github.com/r0bertini/latch">GitHub</a>
     </nav>
   </header>
@@ -135,6 +155,42 @@
     </div>
   </section>
 
+  <section id="pricing">
+    <h2>Pricing</h2>
+    <p class="lede">The script is free and open source forever. Pay only if you want the hosted
+      dashboard that shows what agents actually do on your site.</p>
+    <div class="price">
+      <div class="tier">
+        <span class="tag">Open source</span>
+        <h3>Free</h3>
+        <div class="amt">$0<small> / forever</small></div>
+        <ul>
+          <li>The one-line script — all WebMCP tools</li>
+          <li>Self-host or load from latch.tools</li>
+          <li>Opt-in analytics, last 14 days</li>
+          <li>Tool calls, success rate &amp; recent feed</li>
+        </ul>
+        <div class="cta"><a class="second" href="/app">Create a project key →</a></div>
+      </div>
+      <div class="tier pro">
+        <span class="tag">Hosted control plane</span>
+        <h3>Pro</h3>
+        <div class="amt">$19<small> / month · per project</small></div>
+        <ul>
+          <li>Everything in Free, plus:</li>
+          <li>90-day history</li>
+          <li>Per-agent breakdown (which AI browsers)</li>
+          <li>Full event feed &amp; weekly email summary</li>
+          <li>Priority support</li>
+        </ul>
+        <div class="cta"><a class="primary" id="proCta" href="#">Upgrade to Pro →</a></div>
+      </div>
+    </div>
+    <p class="note" style="margin-top:16px">Analytics is <strong>opt-in and metadata-only</strong>:
+      add <span class="kbd">data-key</span> to your script tag and Latch reports tool name, outcome,
+      and page path — never form contents, query strings, or PII. No key, and Latch makes zero network calls.</p>
+  </section>
+
   <footer>
     <p>🔗 <strong>Latch</strong> — make your site agent-ready in one line.
        Open source (MIT) · <a href="https://github.com/r0bertini/latch">github.com/r0bertini/latch</a></p>
@@ -153,6 +209,16 @@
     this.textContent = "Copied ✓";
     var b = this; setTimeout(function(){ b.textContent = "Copy"; }, 1600);
   });
+
+  // Upgrade to Pro. Paste your Stripe Payment Link below to take card payments;
+  // until then the button falls back to email so it still works.
+  var STRIPE_PRO_LINK = ""; // e.g. "https://buy.stripe.com/xxxxxxxx"
+  (function () {
+    var cta = document.getElementById("proCta");
+    if (!cta) return;
+    cta.href = STRIPE_PRO_LINK ||
+      "mailto:helerob@gmail.com?subject=Latch%20Pro&body=I%27d%20like%20to%20upgrade%20a%20project%20to%20Latch%20Pro.";
+  })();
 
   // Render the agent's-eye view from Latch.inspect(), then register for real.
   function renderEye() {

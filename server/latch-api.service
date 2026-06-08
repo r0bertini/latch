@@ -1,0 +1,25 @@
+[Unit]
+Description=Latch Collector — agent analytics control plane
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/opt/latch-api
+ExecStart=/usr/bin/node /opt/latch-api/latch-collector.mjs
+Environment=NODE_NO_WARNINGS=1
+Environment=LATCH_DB=/var/lib/latch/latch.db
+Environment=LATCH_HOST=127.0.0.1
+Environment=LATCH_PORT=8787
+Restart=on-failure
+RestartSec=2
+# hardening
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/latch
+
+[Install]
+WantedBy=multi-user.target
