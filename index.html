@@ -110,7 +110,7 @@
       buttons and forms. Latch exposes your search, cart, and contact forms as
       <strong>WebMCP tools</strong> an agent can actually use. No server. No rewrite.</p>
     <div class="snippet">
-      <code id="snip"><span class="tag">&lt;script</span> <span class="attr">src</span>=<span class="str">"https://latch.dev/latch.js"</span> <span class="attr">defer</span><span class="tag">&gt;&lt;/script&gt;</span></code>
+      <code id="snip"><span class="tag">&lt;script</span> <span class="attr">src</span>=<span class="str">"https://latch.tools/latch.js"</span> <span class="attr">defer</span><span class="tag">&gt;&lt;/script&gt;</span></code>
       <button class="copy" id="copyBtn">Copy</button>
     </div>
     <p class="note">Drop it before <span class="kbd">&lt;/body&gt;</span>. Zero dependencies · ~6&nbsp;KB · degrades silently where WebMCP isn't present.</p>
@@ -121,7 +121,7 @@
     <p class="lede">It reads your page (read-only) and registers the actions an agent needs — nothing else.</p>
     <div class="grid">
       <div class="card"><h3>🔎 search_site</h3><p>Finds your search box, types the query, and submits — so an agent can look things up.</p></div>
-      <div class="card"><h3>🛒 add_to_cart</h3><p>Detects “Add to cart / Buy now” controls and clicks them on the agent's behalf.</p></div>
+      <div class="card"><h3>🛒 add_to_cart</h3><p>Detects "Add to cart / Buy now" controls and clicks them on the agent's behalf.</p></div>
       <div class="card"><h3>✉️ submit_form</h3><p>Maps your contact / booking / signup fields into a tool an agent can fill and send.</p></div>
       <div class="card"><h3>🧭 navigate</h3><p>Surfaces your main nav links so an agent can move around the site reliably.</p></div>
       <div class="card"><h3>🛡️ Safe by default</h3><p>Read-only discovery. If WebMCP isn't there, Latch does nothing and never breaks your page.</p></div>
@@ -194,7 +194,7 @@
   <footer>
     <p>🔗 <strong>Latch</strong> — make your site agent-ready in one line.
        Open source (MIT) · <a href="https://github.com/r0bertini/latch">github.com/r0bertini/latch</a></p>
-    <p class="note">“Latch” is a common word used by other companies in unrelated classes; this is an independent open-source WebMCP dev tool.</p>
+    <p class="note">"Latch" is a common word used by other companies in unrelated classes; this is an independent open-source WebMCP dev tool.</p>
   </footer>
 
 </div>
@@ -204,7 +204,7 @@
 <script>
   // Copy-to-clipboard for the snippet.
   document.getElementById("copyBtn").addEventListener("click", function () {
-    var line = '<script src="https://latch.dev/latch.js" defer><\/script>';
+    var line = '<script src="https://latch.tools/latch.js" defer><\/script>';
     navigator.clipboard && navigator.clipboard.writeText(line);
     this.textContent = "Copied ✓";
     var b = this; setTimeout(function(){ b.textContent = "Copy"; }, 1600);

@@ -3,7 +3,7 @@
 **One line of code makes your existing website usable by agentic AI browsers.**
 
 ```html
-<script src="https://latch.dev/latch.js" defer></script>
+<script src="https://latch.tools/latch.js" defer></script>
 ```
 
 AI browsers — ChatGPT Atlas, Perplexity Comet, Chrome 146+, Edge 147+ — can now
@@ -19,9 +19,9 @@ No MCP server. No backend. No rebuild. Zero dependencies. ~6&nbsp;KB.
 Latch inspects the DOM and, when it finds them, registers:
 
 | Tool | Triggered by | What it does |
-|------|--------------|--------------|
+|------|--------------|-------------|
 | `search_site` | a search input (`type=search`, `name=q`, `role=searchbox`, …) | types the query and submits the search form |
-| `add_to_cart` | “Add to cart / bag / basket / Buy now” controls | clicks the add-to-cart control |
+| `add_to_cart` | "Add to cart / bag / basket / Buy now" controls | clicks the add-to-cart control |
 | `submit_form` | contact / booking / signup / quote forms | fills the mapped fields and submits |
 | `navigate` | your `<nav>` / header links | moves to a named page |
 
@@ -33,7 +33,7 @@ mutates or breaks the host page.
 Drop the tag in before `</body>`:
 
 ```html
-<script src="https://latch.dev/latch.js" defer></script>
+<script src="https://latch.tools/latch.js" defer></script>
 ```
 
 Or self-host: copy `latch.js` anywhere static and point the `src` at it.
