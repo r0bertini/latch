@@ -6,9 +6,10 @@
 <script src="https://latch.tools/latch.js" defer></script>
 ```
 
-AI browsers — ChatGPT Atlas, Perplexity Comet, Chrome 146+, Edge 147+ — can now
-*operate* web pages through [**WebMCP**](https://www.w3.org/), the Web Model
-Context API (`navigator.modelContext`). But out of the box they have to guess at
+AI browsers — ChatGPT Atlas, Perplexity Comet, Chrome's WebMCP origin trial,
+Edge — can now *operate* web pages through [**WebMCP**](https://www.w3.org/),
+the Web Model Context API (`document.modelContext`; formerly
+`navigator.modelContext`, deprecated in Chrome 150). But out of the box they have to guess at
 your buttons and forms, and they often fail. Latch reads your page (read-only)
 and exposes its core actions as WebMCP tools an agent can call directly.
 
@@ -64,7 +65,8 @@ Set `Latch.debug = true` before init for console diagnostics.
 
 ## How it works
 
-1. On `DOMContentLoaded`, Latch feature-detects `navigator.modelContext`
+1. On `DOMContentLoaded`, Latch feature-detects `document.modelContext` — falling
+   back to the deprecated `navigator.modelContext` for pre-Chrome-150 builds —
    (supporting both the `registerTool()` and `provideContext({tools})` shapes).
 2. It runs **read-only** DOM discovery to find your actionable surface.
 3. It registers one WebMCP tool per capability, each with a JSON Schema an agent

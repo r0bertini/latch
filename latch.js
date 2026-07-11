@@ -3,8 +3,9 @@
  *
  * Latch reads your existing page (read-only) and exposes its core actions —
  * site search, add-to-cart, contact/booking forms, and navigation — as WebMCP
- * tools via `navigator.modelContext`, so AI browsers (ChatGPT Atlas, Comet,
- * Chrome 146+, Edge 147+) can actually operate your site. No MCP server, no
+ * tools via `document.modelContext` (with a `navigator.modelContext` fallback
+ * for pre-Chrome-150 builds), so AI browsers (ChatGPT Atlas, Comet, Chrome's
+ * WebMCP origin trial) can actually operate your site. No MCP server, no
  * backend, no rebuild. If WebMCP isn't present, Latch does nothing and never
  * touches the host page.
  *
@@ -21,7 +22,7 @@
 (function (global) {
   "use strict";
 
-  var VERSION = "0.1.0";
+  var VERSION = "0.1.1";
 
   // ---- optional, opt-in telemetry --------------------------------------
   // Off by default. Turns on ONLY when the script tag carries data-key:
@@ -92,11 +93,14 @@
   }
 
   // ---- WebMCP capability detection -------------------------------------
-  // The Web Model Context API is still settling; support both the
-  // registerTool() shape and the provideContext({tools}) shape, and bail
-  // out cleanly when neither exists.
+  // The Web Model Context API is still settling; the spec attaches it to
+  // document.modelContext (navigator.modelContext is deprecated since
+  // Chrome 150 but still shipped by older builds and polyfills). Support
+  // both surfaces and both the registerTool() shape and the
+  // provideContext({tools}) shape, and bail out cleanly when none exists.
   function mc() {
-    return global.navigator && global.navigator.modelContext;
+    return (global.document && global.document.modelContext) ||
+           (global.navigator && global.navigator.modelContext);
   }
   function webmcpAvailable() {
     var m = mc();
