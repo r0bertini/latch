@@ -2,6 +2,8 @@
 
 **One line of code makes your existing website usable by agentic AI browsers.**
 
+[**latch.tools**](https://latch.tools/?ref=github) · [Add WebMCP to your site](https://latch.tools/webmcp?ref=github) · [See which AI agents visit your site →](https://latch.tools/?ref=github)
+
 ```html
 <script src="https://latch.tools/latch.js" defer></script>
 ```
@@ -85,6 +87,19 @@ Set `Latch.debug = true` before init for console diagnostics.
 
 WebMCP shipped in Chrome 146 and Edge 147 (March 2026) and is implemented by
 agentic browsers (Atlas, Comet). Everywhere else, Latch is a no-op.
+
+## See which AI agents are using your site
+
+The `latch.js` above is free forever and needs no account. When you want to
+know **which** agents are hitting your site and **what** they do, create a free
+project key at [**latch.tools**](https://latch.tools/?ref=github):
+
+- **Free** — live view of the WebMCP tool calls agents make on your site.
+- **Pro — €19/mo per project** — 90-day history, per-agent breakdown, and a
+  weekly email digest. [Upgrade →](https://latch.tools/?ref=github)
+
+No tracking of your visitors, no cookies — Latch only reports the agent tool
+calls the browser itself surfaces.
 
 ## Develop
 
