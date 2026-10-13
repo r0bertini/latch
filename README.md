@@ -85,8 +85,11 @@ Set `Latch.debug = true` before init for console diagnostics.
 
 ## Browser support
 
-WebMCP shipped in Chrome 146 and Edge 147 (March 2026) and is implemented by
-agentic browsers (Atlas, Comet). Everywhere else, Latch is a no-op.
+WebMCP (`document.modelContext`) is in a **public origin trial in Chrome 149**
+(announced at Google I/O, May 2026) and runs through Chrome 156 — it is **not
+yet shipped to stable**. It is implemented by agentic browsers (ChatGPT Atlas,
+Perplexity Comet) and Edge; the earlier `navigator.modelContext` alias is
+deprecated as of Chrome 150. Everywhere else, Latch is a no-op.
 
 ## See which AI agents are using your site
 
